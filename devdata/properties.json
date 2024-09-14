@@ -1,0 +1,151 @@
+[
+    {
+        "name": "Luxurious Villa in Beverly Hills",
+        "images": {
+            "heroImg": "https://example.com/hero.jpg",
+            "gallery": [
+                "https://example.com/gallery1.jpg",
+                "https://example.com/gallery2.jpg"
+            ],
+            "floorMap": [
+                "https://example.com/floorplan.jpg"
+            ]
+        },
+        "map": {
+            "lat": 34.073620,
+            "long": -118.400356
+        },
+        "type": "villa",
+        "location": {
+            "lat": "34.073620",
+            "long": "-118.400356",
+            "address": "123 Beverly Hills Dr",
+            "city": "Beverly Hills",
+            "district": "Los Angeles County",
+            "state": "California",
+            "country": "USA",
+            "amenities": [
+                {
+                    "name": "Park",
+                    "distance": {
+                        "value": 0.5,
+                        "unit": "km"
+                    }
+                },
+                {
+                    "name": "Shopping Mall",
+                    "distance": {
+                        "value": 2,
+                        "unit": "km"
+                    }
+                }
+            ]
+        },
+        "features": {
+            "amenities": ["Pool", "Gym", "Spa"],
+            "renovations": ["Kitchen remodel", "Bathroom upgrade"],
+            "energyRating": "A+",
+            "smartFeatures": ["Smart lighting", "Home automation"],
+            "views": ["Ocean", "City"]
+        },
+        "lastRenovation": {
+            "value": 5,
+            "unit": "years"
+        },
+        "listedBy": {
+            "name": "John Doe Realty",
+            "link": "https://johndoerealty.com",
+            "contact": ["phone"]
+        },
+        "description": {
+            "name": "A stunning villa with breathtaking views and state-of-the-art amenities."
+        },
+        "layout": {
+            "size": {
+                "value": 3500,
+                "unit": "sqft"
+            },
+            "bedrooms": 4,
+            "kitchen": 1,
+            "bathrooms": 5
+        },
+        "occupancy": "vacant",
+        "price": {
+            "value": 5000000,
+            "unit": "USD"
+        },
+        "metadata": {
+            "mls": 123456789,
+            "datePosted": "2024-09-01T12:00:00Z",
+            "dateUpdated": "2024-09-07T12:00:00Z",
+            "views": 1500,
+            "likes": 250
+        }
+    },
+    {
+        "name": "Cozy Apartment in Downtown",
+        "images": {
+            "heroImg": "https://example.com/apt-hero.jpg",
+            "gallery": [
+                "https://example.com/apt-gallery1.jpg",
+                "https://example.com/apt-gallery2.jpg"
+            ],
+            "floorMap": []
+        },
+        "map": {
+            "lat": 40.712776,
+            "long": -74.005974
+        },
+        "type": "apartment",
+        "location": {
+            "lat": "40.712776",
+            "long": "-74.005974",
+            "address": "456 Elm St",
+            "city": "New York",
+            "district": "Manhattan",
+            "state": "New York",
+            "country": "USA",
+            "amenities": []
+        },
+        "features": {
+            "amenities": ["Elevator", "Laundry"],
+            "renovations": [],
+            "energyRating": "B",
+            "smartFeatures": ["Smart thermostat"],
+            "views": ["Cityscape"]
+        },
+        "lastRenovation": {
+            "value": 2,
+            "unit": "years"
+        },
+        "listedBy": {
+            "name": "Jane Smith Realty",
+            "link": "https://janesmithrealty.com",
+            "contact": ["email"]
+        },
+        "description": {
+            "name": "A charming apartment located in the heart of the city, perfect for urban living."
+        },
+        "layout": {
+            "size": {
+                "value": 850,
+                "unit": "sqft"
+            },
+            "bedrooms": 2,
+            "kitchen": 1,
+            "bathrooms": 1
+        },
+        "occupancy": "tenant",
+        "price": {
+            "value": 750000,
+            "unit": "USD"
+        },
+        "metadata": {
+            "mls": 987654321,
+            "datePosted": "2024-08-15T12:00:00Z",
+            "dateUpdated": "2024-08-20T12:00:00Z",
+            "views": 800,
+            "likes": 120
+        }
+    }
+]
