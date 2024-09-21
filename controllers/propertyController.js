@@ -8,19 +8,13 @@ const {
     allowedPropertyUpdateFields,
 } = require('../utils/allowedFields.');
 const uploadToCloud = require('./../utils/uploadToCloud');
+const generateUID = require('./../utils/generateUID');
 
 const multer = require('multer');
 const path = require('path');
 
 // Set storage engine
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/uploads/'); // specify your directory for uploads
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
-});
+const storage = multer.memoryStorage({});
 
 // File filter to only accept images
 const fileFilter = (req, file, cb) => {
@@ -41,34 +35,54 @@ const upload = multer({
 });
 
 exports.uploadPropertyImages = catchAsync(async (req, res, next) => {
+    // console.log(req);
     upload.fields([
-        { name: 'heroImg', maxCount: 1 }, // Single hero image
-        { name: 'gallery', maxCount: 5 }, // Up to 5 gallery images
-        { name: 'floorMap', maxCount: 1 },
+        { name: 'images[heroImg]', maxCount: 1 }, // Single hero image
+        { name: 'images[gallery]', maxCount: 5 }, // Up to 5 gallery images
+        { name: 'images[floorMap]', maxCount: 1 },
     ])(req, res, async (err) => {
         if (err) {
-            return next(new AppError('File upload failed', 500));
+            return next(new AppError('File upload failed: ' + err, 500));
         }
 
         let heroImgUrl,
             galleryUrls = [],
             floorMapUrl;
+        
+        console.log(req.files);
 
-        if (req.files.heroImg) {
-            heroImgUrl = await uploadToCloud(req.files.heroImg[0]); // Placeholder function
+        if (req.files['images[heroImg]']) {
+            const file = req.files['images[heroImg]'][0];
+            const fileName =
+                'properties/' +
+                generateUID(12) +
+                '.' +
+                file.mimetype.split('/')[1];
+            heroImgUrl = await uploadToCloud(file, fileName); // Placeholder function
         }
 
         // Upload Gallery Images
-        if (req.files.gallery) {
-            for (const file of req.files.gallery) {
-                const galleryUrl = await uploadToCloud(file); // Placeholder function
+        if (req.files['images[gallery]']) {
+            for (const file of req.files['images[gallery]']) {
+                const fileName =
+                    'properties/' +
+                    generateUID(12) +
+                    '.' +
+                    file.mimetype.split('/')[1];
+                const galleryUrl = await uploadToCloud(file, fileName); // Placeholder function
                 galleryUrls.push(galleryUrl);
             }
         }
 
         // Upload Floor Map
-        if (req.files.floorMap) {
-            floorMapUrl = await uploadToCloud(req.files.floorMap[0]); // Placeholder function
+        if (req.files['images[floorMap]']) {
+            const file = req.files['images[heroImg]'][0];
+            const fileName =
+                'properties/' +
+                generateUID(12) +
+                '.' +
+                file.mimetype.split('/')[1];
+            floorMapUrl = await uploadToCloud(file, fileName); // Placeholder function
         }
 
         req.body.images = {
@@ -124,7 +138,6 @@ exports.getProperty = catchAsync(async (req, res, next) => {
 });
 
 exports.createProperty = catchAsync(async (req, res, next) => {
-    
     const newProperty = await Property.create(req.body);
 
     res.status(201).json({
@@ -177,3 +190,29 @@ exports.updateProperty = catchAsync(async (req, res, next) => {
         },
     });
 });
+
+exports.searchProperties = catchAsync(async (req, res, next) => {
+    const query = req.query.search;
+
+    if (!query || query.length <= 3) {
+        return new AppError('Please provide a query string called "search" of more than 4 letters', 400);
+    }
+
+    const properties = await Property.find({
+        $or: [
+            { name: { $regex: query, $options: 'i' } }, // Case-insensitive search
+            { 'location.address': { $regex: query, $options: 'i' } },
+            { 'location.city': { $regex: query, $options: 'i' } },
+            { 'location.district': { $regex: query, $options: 'i' } },
+            { 'location.state': { $regex: query, $options: 'i' } },
+        ],
+    }).limit(10);
+
+    res.status(200).json({
+        message: 'success',
+        items: properties.length,
+        data: {
+            properties,
+        },
+    });
+})

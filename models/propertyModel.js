@@ -20,11 +20,6 @@ const propertySchema = new mongoose.Schema(
 				type: String
 			}]
 		},
-		map: {
-			type: String,
-			lat: Number,
-			long: Number
-		},
 		type: {
 			type: String,
 			enum: ['residential', 'commercial', 'villa', 'apartment'],
