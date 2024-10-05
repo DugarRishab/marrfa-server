@@ -34,6 +34,42 @@ const upload = multer({
     fileFilter: fileFilter,
 });
 
+exports.reformatFields = catchAsync(async (req, res, next) => {
+    const updatedFiles = {};
+    console.log(req.files);
+    // Process req.files if any (binary data)
+    if (req.files) {
+        Object.keys(req.files).forEach((fieldName) => {
+            // Regex to match fields starting with 'images[gallery]' or 'images[floorMap]' etc.
+            const match = fieldName.match(
+                /images\[(gallery|floorMap)\]\[\d+\]/
+            );
+
+            if (match) {
+                // Reformat the key to remove the index [0], [1], etc.
+                const newFieldName = fieldName.replace(/\[\d+\]/, '');
+
+                // Append the file to the appropriate field group
+                if (!updatedFiles[newFieldName]) {
+                    updatedFiles[newFieldName] = [];
+                }
+                updatedFiles[newFieldName].push(req.files[fieldName][0]);
+            } else {
+                // Keep non-matching fields as is
+                updatedFiles[fieldName] = req.files[fieldName];
+            }
+        });
+
+        // Replace the original req.files with updated structure
+        req.files = updatedFiles;
+    }
+
+    console.log(req.files);
+    console.log(req.body);
+
+    next();
+})
+
 exports.uploadPropertyImages = catchAsync(async (req, res, next) => {
     // console.log(req);
     upload.fields([
@@ -48,7 +84,7 @@ exports.uploadPropertyImages = catchAsync(async (req, res, next) => {
         let heroImgUrl,
             galleryUrls = [],
             floorMapUrl;
-        
+
         console.log(req.files);
 
         if (req.files['images[heroImg]']) {

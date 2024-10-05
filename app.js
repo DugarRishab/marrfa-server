@@ -10,7 +10,7 @@ const dotenv = require('dotenv');
 const helmet = require('helmet');
 
 // %IMPORT ROUTERS% ->> 
-const router = require('./routes/routes');
+
 const AppError = require('./utils/appError');
 const errorController = require('./controllers/errorController');
 const propertyRouter = require('./routes/propertyRoutes');
@@ -23,8 +23,28 @@ dotenv.config({ path: './config.env' }); // <- connecting the enviroment variabl
 app.enable('trust proxy');
 
 console.log('REMOTE: ', process.env.REMOTE);
+console.log('REMOTE: ', process.env.REMOTE_ADMIN);
 
-app.use(cors({ credentials: true, origin: process.env.REMOTE })); // <- CORS configuration, in case if you wanted to implemented authorization
+// Define a function to determine allowed origins based on the request's origin
+const determineAllowedOrigin = (origin, callback) => {
+	console.log('origin=', origin); 
+    if (!origin) {
+        callback(null, true); // Allow requests with no origin (e.g., same-origin requests)
+    } else if (origin === process.env.REMOTE || origin === process.env.REMOTE_ADMIN) {
+        callback(null, true); // Allow requests from subdomains of example.com
+    } else {
+        callback(new Error(`Origin - ${origin} not allowed by CORS`)); // Block other origins
+    }
+};
+
+const corsOptions = {
+    credentials: true,
+    origin: determineAllowedOrigin,
+};
+
+app.use(cors(corsOptions));
+
+// app.use(cors({ credentials: true, origin: process.env.REMOTE })); // <- CORS configuration, in case if you wanted to implemented authorization
 app.options(process.env.REMOTE, cors());
 
 console.log((`ENV = ${process.env.NODE_ENV}`));

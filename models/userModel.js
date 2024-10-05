@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema(
             default: 'user',
             enum: ['user', 'admin'],
         },
+        active: {
+            type: Boolean,
+            default: true
+        }
     },
     {
         toJSON: { virtuals: true },
