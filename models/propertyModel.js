@@ -131,6 +131,9 @@ const propertySchema = new mongoose.Schema({
             type: Number,
             default: 0,
         },
+        completionDate: {
+            type: String
+        }
     },
 });
 

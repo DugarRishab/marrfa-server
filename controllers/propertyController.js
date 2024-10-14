@@ -81,13 +81,26 @@ exports.uploadPropertyImages = catchAsync(async (req, res, next) => {
             return next(new AppError('File upload failed: ' + err, 500));
         }
 
-        let heroImgUrl,
-            galleryUrls = [],
-            floorMapUrl;
+        console.log(req.body.images);
 
+        let heroImgUrl, // Default to existing images
+            galleryUrls = [], // Preserve existing gallery images
+            floorMapUrl;
+        
+        if (req.body.images) {
+            heroImgUrl = req.body.images.heroImg
+                    ? req.body.images.heroImg
+                    : null, // Default to existing images
+                galleryUrls = [
+                    ...(req.body.images.gallery ? req.body.images.gallery : []),
+                ], // Preserve existing gallery images
+                floorMapUrl = req.body.images.floorMap
+                    ? req.body.images.floorMap
+                    : null;
+        }
         console.log(req.files);
 
-        if (req.files['images[heroImg]']) {
+        if (req.files && req.files['images[heroImg]']) {
             const file = req.files['images[heroImg]'][0];
             const fileName =
                 'properties/' +
@@ -98,7 +111,7 @@ exports.uploadPropertyImages = catchAsync(async (req, res, next) => {
         }
 
         // Upload Gallery Images
-        if (req.files['images[gallery]']) {
+        if (req.files && req.files['images[gallery]']) {
             for (const file of req.files['images[gallery]']) {
                 const fileName =
                     'properties/' +
@@ -111,7 +124,7 @@ exports.uploadPropertyImages = catchAsync(async (req, res, next) => {
         }
 
         // Upload Floor Map
-        if (req.files['images[floorMap]']) {
+        if (req.files && req.files['images[floorMap]']) {
             const file = req.files['images[heroImg]'][0];
             const fileName =
                 'properties/' +
@@ -201,10 +214,9 @@ exports.deleteProperty = catchAsync(async (req, res, next) => {
 
 exports.updateProperty = catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    checkId(id);
+    checkId(id, next);
 
     const updates = Object.keys(req.body)
-        .filter((key) => allowedPropertyUpdateFields.includes(key))
         .reduce((acc, key) => {
             acc[key] = req.body[key];
             return acc;
@@ -228,22 +240,96 @@ exports.updateProperty = catchAsync(async (req, res, next) => {
 });
 
 exports.searchProperties = catchAsync(async (req, res, next) => {
-    const query = req.query.search;
+    const {
+        priceMin,
+        priceMax,
+        yieldMin,
+        yieldMax,
+        completionDate,
+        marrfexIndexMin,
+        marrfexIndexMax,
+        areaMin,
+        areaMax,
+        // city,
+        type, 
+        occupancy, 
+        search,
+    } = req.query;
 
-    if (!query || query.length <= 3) {
-        return new AppError('Please provide a query string called "search" of more than 4 letters', 400);
+    // Ensure a valid search term is provided
+    if (!search || search.length < 3) {
+        return next(
+            new AppError(
+                'Please provide a query string called "search" of more than 3 letters',
+                400
+            )
+        );
     }
 
-    const properties = await Property.find({
+    // Initialize the filter object
+    const filter = {
         $or: [
-            { name: { $regex: query, $options: 'i' } }, // Case-insensitive search
-            { 'location.address': { $regex: query, $options: 'i' } },
-            { 'location.city': { $regex: query, $options: 'i' } },
-            { 'location.district': { $regex: query, $options: 'i' } },
-            { 'location.state': { $regex: query, $options: 'i' } },
+            { name: { $regex: search, $options: 'i' } }, // Case-insensitive search
+            { 'location.address': { $regex: search, $options: 'i' } },
+            { 'location.city': { $regex: search, $options: 'i' } },
+            { 'location.district': { $regex: search, $options: 'i' } },
+            { 'location.state': { $regex: search, $options: 'i' } },
+            { 'location.country': { $regex: search, $options: 'i' } },
         ],
-    }).limit(10);
+    };
 
+    // Add price range filter
+    if (priceMin || priceMax) {
+        filter['price.value'] = {};
+        if (priceMin) filter['price.value'].$gte = priceMin;
+        if (priceMax) filter['price.value'].$lte = priceMax;
+    }
+
+    // Add yield range filter
+    // if (yieldMin || yieldMax) {
+    //     filter.yield = {};
+    //     if (yieldMin) filter.yield.$gte = yieldMin;
+    //     if (yieldMax) filter.yield.$lte = yieldMax;
+    // }
+
+    // Add CompletionDate exact match filter (now treated as a string)
+    // if (completionDate) {
+    //     filter['metadata.completionDate'] = completionDate;
+    // }
+
+    // Add Marrfex index filter
+    // if (marrfexIndexMin || marrfexIndexMax) {
+    //     filter.marrfexIndex = {};
+    //     if (marrfexIndexMin) filter.marrfexIndex.$gte = marrfexIndexMin;
+    //     if (marrfexIndexMax) filter.marrfexIndex.$lte = marrfexIndexMax;
+    // }
+
+    // Add area range filter
+    // if (areaMin || areaMax) {
+    //     filter['layout.size.value'] = {};
+    //     if (areaMin) filter['layout.size.value'].$gte = areaMin;
+    //     if (areaMax) filter['layout.size.value'].$lte = areaMax;
+    // }
+
+    // Add city filter
+    // if (city) {
+    //     filter['location.city'] = city;
+    // }
+
+    // Add property type filter
+    if (type) {
+        filter.type = type;
+    }
+
+    // Add occupancy filter
+    if (occupancy) {
+        filter.occupancy = occupancy;
+    }
+
+    // Find properties based on the filters
+    const properties = await Property.find(filter).limit(10);
+
+    // Return the filtered results
     res.status(200).json({
         message: 'success',
         items: properties.length,
@@ -251,4 +337,5 @@ exports.searchProperties = catchAsync(async (req, res, next) => {
             properties,
         },
     });
-})
+});
+
