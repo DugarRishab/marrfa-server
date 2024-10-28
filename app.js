@@ -32,7 +32,7 @@ const determineAllowedOrigin = (origin, callback) => {
 	console.log('origin=', origin); 
     if (!origin) {
         callback(null, true); // Allow requests with no origin (e.g., same-origin requests)
-    } else if (origin === process.env.REMOTE || origin === process.env.REMOTE_ADMIN) {
+    } else if (origin === process.env.REMOTE || origin === process.env.REMOTE_ADMIN || origin === process.env.REMOTE_BLOG) {
         callback(null, true); // Allow requests from subdomains of example.com
     } else {
         callback(new Error(`Origin - ${origin} not allowed by CORS`)); // Block other origins
