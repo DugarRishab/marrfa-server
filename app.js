@@ -8,6 +8,7 @@ const compression = require('compression');
 const rateLimit = require('express-rate-limit');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 
 // %IMPORT ROUTERS% ->> 
 
@@ -15,6 +16,7 @@ const AppError = require('./utils/appError');
 const errorController = require('./controllers/errorController');
 const propertyRouter = require('./routes/propertyRoutes');
 const userRouter = require('./routes/userRoutes');
+const blogRouter = require('./routes/blogRoutes');
 const authRouter = require('./routes/authRoutes');// <<- %IMPORT ROUTERS%
 const app = express();
 
@@ -74,7 +76,7 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: '100mb' })); // <- Parses Json data
 app.use(express.urlencoded({ extended: true, limit: '100mb' })); // <- Parses URLencoded data
-
+app.use(cookieParser());
 app.use(mongoSanitize()); // <- Data Sanitization aganist NoSQL query Injection.
 app.use(xss()); // <- Data Sanitization against xss
 
@@ -87,7 +89,8 @@ app.use(compression());
 
 app.use('/api/v1/property/', propertyRouter); // <- Calling the property router
 app.use('/api/v1/user/', userRouter); // <- Calling the user router
-app.use('/api/v1/auth/', authRouter); // <- Calling the auth router// <<- %USE ROUTERS%
+app.use('/api/v1/auth/', authRouter);
+app.use('/api/v1/blog/', blogRouter); // <- Calling the auth router// <<- %USE ROUTERS%
 app.all('*', (req, res, next) => {	// <- Middleware to handle Non-existing Routes
 	next(new AppError(`Can't find ${req.originalUrl} on the server`, 404));
 });

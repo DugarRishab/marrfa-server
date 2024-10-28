@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const AppError = require('./appError');
 
 const checkId = (id, next) => {
 	if (!mongoose.Types.ObjectId.isValid(id)) {

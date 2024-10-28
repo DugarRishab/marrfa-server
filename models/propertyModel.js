@@ -55,7 +55,6 @@ const propertySchema = new mongoose.Schema({
             },
         ],
     },
-
     features: {
         amenities: [
             {

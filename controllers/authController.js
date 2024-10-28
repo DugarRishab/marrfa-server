@@ -127,11 +127,13 @@ exports.protect = catchAsync(async (req, res, next) => {
 	res.locals.user = currentUser;
 	req.user = currentUser;
 
+	// console.log(req.user.role);
+
 	next();
 });
 exports.restrictTo = (...roles) => {
 	return (req, res, next) => {
-		if (!roles.includes(req.user.roles)) {
+		if (!roles.includes(req.user.role)) {
 			return next(new AppError('You do not have permision to perform this action', 401));
 		}
 		next();

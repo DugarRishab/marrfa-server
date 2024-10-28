@@ -4,16 +4,11 @@ const User = require('./../models/userModel');
 const Blog = require('./../models/blogModel');
 const checkId = require('./../utils/checkIdFormat');
 const uploadToCloud = require('./../utils/uploadToCloud');
+const multer = require('multer');
+const generateUID = require('./../utils/generateUID');
 
 // Set storage engine
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'public/uploads/'); // specify your directory for uploads
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    },
-});
+const storage = multer.memoryStorage({});
 
 // File filter to only accept images
 const fileFilter = (req, file, cb) => {
@@ -42,27 +37,41 @@ exports.uploadBlogImages = catchAsync(async (req, res, next) => {
             return next(new AppError('File upload failed', 500));
         }
 
-		let coverImgUrl;
+		let coverImgUrl = req.body.coverImg || "";
 
-        if (req.files.coverImg) {
+        if (req.files && req.files.coverImg) {
+            const file = req.files['coverImg'][0];
             const fileName =
                 'blogs/' +
                 generateUID(12) +
                 '.' +
                 file.mimetype.split('/')[1];
             coverImgUrl = await uploadToCloud(req.files.coverImg[0], fileName); // Placeholder function
+            req.body.coverImg = coverImgUrl;
         }
 
-        req.body.images = {
-            coverImg: coverImgUrl,
-        };
+       
 
         next();
     });
 });
 
 exports.getAllBlogs = catchAsync(async (req, res, next) => {
-	let query;
+	let query = { active: { $ne: false } }; // Default query for active blogs
+
+    // Check if the user is an admin or author to include drafts
+    if (req.user.role === 'admin' || req.user.role === 'author') {
+        query = {}; // No filter for active, include all blogs (including drafts)
+    }
+
+    if (req.query) {
+        query = Object.keys(req.query)
+            // .filter((key) => allowedPropertyQueryFields.includes(key))
+            .reduce((acc, key) => {
+                acc[key] = req.body[key];
+                return acc;
+            }, {});
+    }
 
 	const blogs = await Blog.find(req.query);
 
@@ -78,7 +87,7 @@ exports.getAllBlogs = catchAsync(async (req, res, next) => {
 exports.getBlog = catchAsync(async (req, res, next) => {
     const { id } = req.params;
 
-    checkId(id); // checks the format of the id field
+    checkId(id, next); // checks the format of the id field
 
     const blog = await Blog.findById(id);
 
@@ -94,25 +103,25 @@ exports.getBlog = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.createProperty = catchAsync(async (req, res, next) => {
-    const newProperty = await Property.create(req.body);
+exports.createBlog = catchAsync(async (req, res, next) => {
+    const newBlog = await Blog.create(req.body);
 
     res.status(201).json({
         message: 'success',
         data: {
-            property: newProperty,
+            blog: newBlog,
         },
     });
 });
 
-exports.deleteProperty = catchAsync(async (req, res, next) => {
+exports.deleteBlog = catchAsync(async (req, res, next) => {
     const { id } = req.params;
     checkId(id);
 
-    const property = await Property.findByIdAndDelete(id);
+    const blog = await Blog.findByIdAndDelete(id);
 
-    if (!property) {
-        return next(new AppError('No such property found with id: ' + id, 404));
+    if (!blog) {
+        return next(new AppError('No such blog found with id: ' + id, 404));
     }
 
     res.status(200).json({
@@ -120,30 +129,30 @@ exports.deleteProperty = catchAsync(async (req, res, next) => {
     });
 });
 
-exports.updateProperty = catchAsync(async (req, res, next) => {
+exports.updateBlog = catchAsync(async (req, res, next) => {
     const { id } = req.params;
     checkId(id);
 
     const updates = Object.keys(req.body)
-        .filter((key) => allowedPropertyUpdateFields.includes(key))
+        // .filter((key) => allowedPropertyUpdateFields.includes(key))
         .reduce((acc, key) => {
             acc[key] = req.body[key];
             return acc;
         }, {});
 
-    const property = await Property.findByIdAndUpdate(id, updates, {
+    const blog = await Blog.findByIdAndUpdate(id, updates, {
         new: true,
         runValidators: true,
     });
 
-    if (!property) {
-        return next(new AppError('No such property found with id: ' + id, 404));
+    if (!blog) {
+        return next(new AppError('No such blog found with id: ' + id, 404));
     }
 
     res.status(200).json({
         message: 'success',
         data: {
-            property,
+            blog,
         },
     });
 });

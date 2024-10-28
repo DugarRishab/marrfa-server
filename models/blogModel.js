@@ -30,6 +30,13 @@ const blogSchema = new mongoose.Schema({
             default: 0,
         },
     },
+    active: {
+        type: Boolean,
+        default: false
+    },
+    tags: {
+        type: [String]
+    }
 });
 
 const Blog = mongoose.model('Blog', blogSchema);
