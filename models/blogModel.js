@@ -36,6 +36,9 @@ const blogSchema = new mongoose.Schema({
     },
     tags: {
         type: [String]
+    },
+    description: {
+        type: String
     }
 });
 
