@@ -293,16 +293,16 @@ exports.searchProperties = catchAsync(async (req, res, next) => {
     // }
 
     // Add CompletionDate exact match filter (now treated as a string)
-    // if (completionDate) {
-    //     filter['metadata.completionDate'] = completionDate;
-    // }
+    if (completionDate) {
+        filter['metadata.completionDate'] = completionDate;
+    }
 
     // Add Marrfex index filter
-    // if (marrfexIndexMin || marrfexIndexMax) {
-    //     filter.marrfexIndex = {};
-    //     if (marrfexIndexMin) filter.marrfexIndex.$gte = marrfexIndexMin;
-    //     if (marrfexIndexMax) filter.marrfexIndex.$lte = marrfexIndexMax;
-    // }
+    if (marrfexIndexMin || marrfexIndexMax) {
+        filter.marrfexIndex = {};
+        if (marrfexIndexMin) filter.marrfexIndex.$gte = marrfexIndexMin;
+        if (marrfexIndexMax) filter.marrfexIndex.$lte = marrfexIndexMax;
+    }
 
     // Add area range filter
     // if (areaMin || areaMax) {
