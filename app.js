@@ -17,6 +17,7 @@ const errorController = require('./controllers/errorController');
 const propertyRouter = require('./routes/propertyRoutes');
 const userRouter = require('./routes/userRoutes');
 const blogRouter = require('./routes/blogRoutes');
+const userRequestRouter = require('./routes/userRequestRoutes');
 const authRouter = require('./routes/authRoutes');// <<- %IMPORT ROUTERS%
 const app = express();
 
@@ -90,6 +91,7 @@ app.use(compression());
 app.use('/api/v1/property/', propertyRouter); // <- Calling the property router
 app.use('/api/v1/user/', userRouter); // <- Calling the user router
 app.use('/api/v1/auth/', authRouter);
+app.use('/api/v1/userRequest/', userRequestRouter);
 app.use('/api/v1/blog/', blogRouter); // <- Calling the auth router// <<- %USE ROUTERS%
 app.all('*', (req, res, next) => {	// <- Middleware to handle Non-existing Routes
 	next(new AppError(`Can't find ${req.originalUrl} on the server`, 404));
