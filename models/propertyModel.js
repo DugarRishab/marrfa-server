@@ -135,7 +135,7 @@ const propertySchema = new mongoose.Schema({
         },
         marrfex: {
             type: Number,
-            enum: ['1', '2', '3', '4', '5']
+            enum: [1, 2, 3, 4, 5]
         }
     },
 });

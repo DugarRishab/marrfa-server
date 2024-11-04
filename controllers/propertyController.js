@@ -299,17 +299,17 @@ exports.searchProperties = catchAsync(async (req, res, next) => {
 
     // Add Marrfex index filter
     if (marrfexIndexMin || marrfexIndexMax) {
-        filter.marrfexIndex = {};
-        if (marrfexIndexMin) filter.marrfexIndex.$gte = marrfexIndexMin;
-        if (marrfexIndexMax) filter.marrfexIndex.$lte = marrfexIndexMax;
+        filter['metadata.marrfex'] = {};
+        if (marrfexIndexMin) filter['metadata.marrfex'].$gte = marrfexIndexMin;
+        if (marrfexIndexMax) filter['metadata.marrfex'].$lte = marrfexIndexMax;
     }
 
     // Add area range filter
-    // if (areaMin || areaMax) {
-    //     filter['layout.size.value'] = {};
-    //     if (areaMin) filter['layout.size.value'].$gte = areaMin;
-    //     if (areaMax) filter['layout.size.value'].$lte = areaMax;
-    // }
+    if (areaMin || areaMax) {
+        filter['layout.size.value'] = {};
+        if (areaMin) filter['layout.size.value'].$gte = areaMin;
+        if (areaMax) filter['layout.size.value'].$lte = areaMax;
+    }
 
     // Add city filter
     // if (city) {
