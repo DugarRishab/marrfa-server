@@ -286,11 +286,11 @@ exports.searchProperties = catchAsync(async (req, res, next) => {
     }
 
     // Add yield range filter
-    // if (yieldMin || yieldMax) {
-    //     filter.yield = {};
-    //     if (yieldMin) filter.yield.$gte = yieldMin;
-    //     if (yieldMax) filter.yield.$lte = yieldMax;
-    // }
+    if (yieldMin || yieldMax) {
+        filter['finance.yield'] = {};
+        if (yieldMin) filter['finance.yield'].$gte = yieldMin;
+        if (yieldMax) filter['finance.yield'].$lte = yieldMax;
+    }
 
     // Add CompletionDate exact match filter (now treated as a string)
     if (completionDate) {
@@ -299,9 +299,9 @@ exports.searchProperties = catchAsync(async (req, res, next) => {
 
     // Add Marrfex index filter
     if (marrfexIndexMin || marrfexIndexMax) {
-        filter['metadata.marrfex'] = {};
-        if (marrfexIndexMin) filter['metadata.marrfex'].$gte = marrfexIndexMin;
-        if (marrfexIndexMax) filter['metadata.marrfex'].$lte = marrfexIndexMax;
+        filter['finance.marrfex'] = {};
+        if (marrfexIndexMin) filter['finance.marrfex'].$gte = marrfexIndexMin;
+        if (marrfexIndexMax) filter['finance.marrfex'].$lte = marrfexIndexMax;
     }
 
     // Add area range filter

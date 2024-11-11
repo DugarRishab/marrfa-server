@@ -64,7 +64,6 @@ const propertySchema = new mongoose.Schema({
         renovations: [String],
         energyRating: String,
         smartFeatures: [String],
-        
     },
     lastRenovation: {
         value: Number,
@@ -81,8 +80,8 @@ const propertySchema = new mongoose.Schema({
                 type: {
                     type: String,
                     enum: ['phone', 'email'],
-				},
-				value: String
+                },
+                value: String,
             },
         ],
     },
@@ -131,11 +130,16 @@ const propertySchema = new mongoose.Schema({
             default: 0,
         },
         completionDate: {
-            type: String
+            type: String,
         },
+    },
+    finance: {
         marrfex: {
             type: Number,
-            enum: [1, 2, 3, 4, 5]
+            enum: [1, 2, 3, 4, 5],
+        },
+        yield: {
+            type: String,
         }
     },
 });
