@@ -317,14 +317,14 @@ exports.searchProperties = catchAsync(async (req, res, next) => {
     // }
 
     // Add property type filter
-    if (type) {
-        filter.type = type;
-    }
+    // if (type) {
+    //     filter.type = type;
+    // }
 
     // Add occupancy filter
-    if (occupancy) {
-        filter.occupancy = occupancy;
-    }
+    // if (occupancy) {
+    //     filter.occupancy = occupancy;
+    // }
 
     // Find properties based on the filters
     const properties = await Property.find(filter).limit(10);

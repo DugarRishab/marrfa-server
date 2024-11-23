@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 
+const { Decimal128 } = mongoose.Schema.Types;
+
 const propertySchema = new mongoose.Schema({
     name: {
         type: String,
@@ -139,7 +141,7 @@ const propertySchema = new mongoose.Schema({
             enum: [1, 2, 3, 4, 5],
         },
         yield: {
-            type: String,
+            type: Number,
         }
     },
 });
